@@ -22,8 +22,11 @@ Plugin 'Raimondi/delimitMate'
 Plugin 'ctrlpvim/ctrlp.vim'
 " nerdtree - directory 
 Plugin 'scrooloose/nerdtree'
-" javacomplete - Java omnifunc
-Plugin 'artur-shaik/vim-javacomplete2'
+" tagbar 
+Plugin 'majutsushi/tagbar'
+
+" eclim
+" INSTALL THIS ON YOUR OWN FOR JAVA AUTOCOMPLETE TO WORK
 
 
 " All of your Plugins must be added before the following line
@@ -47,8 +50,13 @@ let g:UltiSnipsListSnippets="<c-e>"
 " some bug going on right now.. use F5 to force Filetype recognition
 nnoremap <F5> :doautocmd FileType<CR>
 
-"Set java omnifunc from javacomplete
-autocmd FileType java setlocal omnifunc=javacomplete#Complete
+let g:ycm_collect_identifiers_from_tags_files = 1
+
+" eclim auto complete
+let g:EclimCompletionMethod = 'omnifunc'
+
+" jump to tagbar window when opening
+let g:tagbar_autofocus = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
@@ -67,7 +75,11 @@ let g:mapleader = ","
 " Fast saving
 nmap <leader>w :w!<cr>
 
-nmap <leader>d :NERDTreeToggle<CR>
+nmap <leader>n :NERDTreeToggle<CR>
+nmap <leader>b :TagbarToggle<CR>
+nmap <leader>v :TagbarOpen j<CR>
+nmap <leader>p :TagbarTogglePause<CR>
+nnoremap <leader>d :CtrlPTag<cr>
 " :W sudo saves the file 
 " (useful for handling the permission-denied error)
 "command W w !sudo tee % > /dev/null
@@ -226,10 +238,10 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 " Close the current buffer
-map <leader>bd :Bclose<cr>:tabclose<cr>gT
+"map <leader>bd :Bclose<cr>:tabclose<cr>gT
 
 " Close all the buffers
-map <leader>ba :bufdo bd<cr>
+"map <leader>ba :bufdo bd<cr>
 
 map <leader>l :bnext<cr>
 map <leader>h :bprevious<cr>
