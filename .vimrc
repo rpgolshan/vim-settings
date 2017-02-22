@@ -25,6 +25,9 @@ Plugin 'scrooloose/nerdtree'
 " tagbar 
 Plugin 'majutsushi/tagbar'
 
+"ycm extra conf generator -- :YcmGenerateConfig
+Plugin 'rdnetto/YCM-Generator'
+
 " eclim
 " INSTALL THIS ON YOUR OWN FOR JAVA AUTOCOMPLETE TO WORK
 
