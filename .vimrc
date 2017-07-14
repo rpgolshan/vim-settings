@@ -10,23 +10,38 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 " Keep Plugin commands between vundle#begin/end.
-
+"uninstalled bc version diff in vim. using neocomplete instead
 Plugin 'Valloric/YouCompleteMe'
+"ycm extra conf generator -- :YcmGenerateConfig
+Plugin 'rdnetto/YCM-Generator'
+
+"Plugin 'davidhalter/jedi-vim'
+"Plugin 'Shougo/neocomplete.vim'
+
 " Track the engine.
 Plugin 'SirVer/ultisnips'
 " Snippets are separated from the engine. Add this if you want them:
 Plugin 'honza/vim-snippets'
 " delimitMate Adds end brackets and stuffs
 Plugin 'Raimondi/delimitMate'
-" CtrlP 
+" CtrlP https://github.com/ctrlpvim/ctrlp.vim 
 Plugin 'ctrlpvim/ctrlp.vim'
 " nerdtree - directory 
 Plugin 'scrooloose/nerdtree'
 " tagbar 
-Plugin 'majutsushi/tagbar'
+if executable('ctags')
+    Bundle 'majutsushi/tagbar'
+endif
+" solarized colorscheme https://github.com/jwhitley/vim-colors-solarized
+" Plugin 'altercation/vim-colors-solarized'
+Plugin 'jwhitley/vim-colors-solarized'
+" NERD commenter https://github.com/scrooloose/nerdcommenter
+Plugin 'scrooloose/nerdcommenter'
+" Fugitive - git intergrator https://github.com/tpope/vim-fugitive
+Plugin 'tpope/vim-fugitive'
 
-"ycm extra conf generator -- :YcmGenerateConfig
-Plugin 'rdnetto/YCM-Generator'
+"linter - https://github.com/vim-syntastic/syntastic
+Plugin 'vim-syntastic/syntastic'
 
 " eclim
 " INSTALL THIS ON YOUR OWN FOR JAVA AUTOCOMPLETE TO WORK
@@ -39,8 +54,8 @@ filetype plugin indent on    " required
 "filetype plugin on
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
-let g:UltiSnipsUsePythonVersion = 2
-let g:ycm_use_ultisnips_completer = 1
+"let g:UltiSnipsUsePythonVersion = 2
+ let g:ycm_use_ultisnips_completer = 1
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
@@ -50,10 +65,25 @@ let g:UltiSnipsExpandTrigger="<c-j>"
 " c-e to show all snips
 let g:UltiSnipsListSnippets="<c-e>"
 
+let g:ycm_auto_trigger = 1
+let g:ycm_autoclose_preview_window_after_insertion = 1
+" Disable AutoComplPop.
+" Use neocomplete.
+" let g:neocomplete#enable_at_startup = 1
+" Use smartcase.
+" let g:neocomplete#enable_smart_case = 1
+
+
 " some bug going on right now.. use F5 to force Filetype recognition
 nnoremap <F5> :doautocmd FileType<CR>
 
+" autocmd FileType python setlocal omnifunc=jedi#completions
+" let g:jedi#completions_enabled=0
+" let g:jedi#auto_vim_configuration=0
 let g:ycm_collect_identifiers_from_tags_files = 1
+
+let g:ycm_confirm_extra_conf = 0
+" let g:ycm_confirm_extra_conf = '/~/lab-charms/latest/ubenchmark/src/.ycm_extra_conf.py'
 
 " eclim auto complete
 let g:EclimCompletionMethod = 'omnifunc'
@@ -61,9 +91,20 @@ let g:EclimCompletionMethod = 'omnifunc'
 " jump to tagbar window when opening
 let g:tagbar_autofocus = 1
 
+" Enable trimming of trailing whitespace when uncommenting
+let g:NERDTrimTrailingWhitespace = 1
+" Add spaces after comment delimiters by default
+let g:NERDSpaceDelims = 1
+
+let g:jedi#usages_command = ""
+let g:NERDDefaultAlign = "left"
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Show line numbers
+set relativenumber
+set number
 " Sets how many lines of history VIM has to remember
 set history=500
 
@@ -81,12 +122,15 @@ nmap <leader>w :w!<cr>
 nmap <leader>n :NERDTreeToggle<CR>
 nmap <leader>b :TagbarToggle<CR>
 nmap <leader>v :TagbarOpen j<CR>
-nmap <leader>p :TagbarTogglePause<CR>
-nnoremap <leader>d :CtrlPTag<cr>
+"nmap <leader>p :TagbarTogglePause<CR>
+nnoremap <leader>p :CtrlPTag<cr>
 " :W sudo saves the file 
 " (useful for handling the permission-denied error)
 "command W w !sudo tee % > /dev/null
 
+" fixing common mistakes
+command W w
+command Q q
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => VIM user interface
@@ -163,11 +207,50 @@ set tm=500
 " Enable syntax highlighting
 syntax enable 
 
-"colorscheme desert
-
 set background=dark
+"colorscheme desert
+if filereadable(expand("~/.vim/bundle/vim-colors-solarized/colors/solarized.vim"))
+    let g:solarized_termcolors=256
+    let g:solarized_termtrans=1
+    let g:solarized_contrast="normal"
+    let g:solarized_visibility="normal"
+    colorscheme solarized
+endif
+
+
+set cursorline                  " Highlight current line
+
 highlight Pmenu ctermfg=0 ctermbg=7
 highlight PmenuSel ctermfg=0 ctermbg=4
+
+if has('cmdline_info')
+        set ruler                   " Show the ruler
+        set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " A ruler on steroids
+        set showcmd                 " Show partial commands in status line and
+                                    " Selected characters/lines in visual mode
+    endif
+
+if has('statusline')
+    set laststatus=2
+
+    " Broken down into easily includeable segments
+    set statusline=%<%f\                     " Filename
+    set statusline+=%w%h%m%r                 " Options
+    set statusline+=\ [%{&ff}/%Y]            " Filetype
+    " set statusline+=\ [%{getcwd()}]          " Current dir
+    set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
+endif
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 0
+" let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 0 
+"let g:syntastic_quiet_messages = { "type": "style" }
+let g:syntastic_python_pylint_args = '--rcfile=/home/robgol01/.pylintrc'
+let g:syntastic_python_flake8_args = '--config=/home/robgol01/.config/flake8'
+let g:syntastic_aggregate_errors = 1
+let g:syntastic_python_checkers = ['flake8', 'pylint', 'python']
 
 " Set extra options when running in GUI mode
 if has("gui_running")
@@ -287,7 +370,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 set laststatus=2
 
 " Format the status line
-set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
+" set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -400,3 +483,8 @@ function! <SID>BufcloseCloseIt()
      execute("bdelete! ".l:currentBufNum)
    endif
 endfunction
+
+let g:NERDTreeDirArrowExpandable = '+'
+let g:NERDTreeDirArrowCollapsible = '-'
+
+autocmd BufWritePre * %s/\s\+$//e
