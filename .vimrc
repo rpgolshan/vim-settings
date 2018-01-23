@@ -1,4 +1,5 @@
 set nocompatible              " be iMproved, required
+set fileformat=unix
 filetype off                  " required
 
 " set the runtime path to include Vundle and initialize
@@ -10,13 +11,6 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 " Keep Plugin commands between vundle#begin/end.
-"uninstalled bc version diff in vim. using neocomplete instead
-Plugin 'Valloric/YouCompleteMe'
-"ycm extra conf generator -- :YcmGenerateConfig
-Plugin 'rdnetto/YCM-Generator'
-
-"Plugin 'davidhalter/jedi-vim'
-"Plugin 'Shougo/neocomplete.vim'
 
 " Track the engine.
 Plugin 'SirVer/ultisnips'
@@ -24,11 +18,11 @@ Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 " delimitMate Adds end brackets and stuffs
 Plugin 'Raimondi/delimitMate'
-" CtrlP https://github.com/ctrlpvim/ctrlp.vim 
+" CtrlP https://github.com/ctrlpvim/ctrlp.vim
 Plugin 'ctrlpvim/ctrlp.vim'
-" nerdtree - directory 
+" nerdtree - directory
 Plugin 'scrooloose/nerdtree'
-" tagbar 
+" tagbar
 if executable('ctags')
     Bundle 'majutsushi/tagbar'
 endif
@@ -43,6 +37,17 @@ Plugin 'tpope/vim-fugitive'
 "linter - https://github.com/vim-syntastic/syntastic
 Plugin 'vim-syntastic/syntastic'
 
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+" https://github.com/tpope/vim-surround
+Plugin 'tpope/vim-surround'
+
+Plugin 'ryanoasis/vim-devicons'
+" Plugin 'powerline/fonts'
+
+Plugin 'Valloric/YouCompleteMe'
+"ycm extra conf generator -- :YcmGenerateConfig
+Plugin 'rdnetto/YCM-Generator'
 " eclim
 " INSTALL THIS ON YOUR OWN FOR JAVA AUTOCOMPLETE TO WORK
 
@@ -82,7 +87,8 @@ nnoremap <F5> :doautocmd FileType<CR>
 " let g:jedi#auto_vim_configuration=0
 let g:ycm_collect_identifiers_from_tags_files = 1
 
-let g:ycm_confirm_extra_conf = 0
+" let g:ycm_confirm_extra_conf = '/cygdrive/c/Users/robgol01/OneDrive - ARM/Documents/445L/.ycm_extra_conf.py'
+" let g:ycm_global_ycm_extra_conf = '/cygdrive/c/Users/robgol01/OneDrive - ARM/Documents/445L/.ycm_extra_conf.py'
 " let g:ycm_confirm_extra_conf = '/~/lab-charms/latest/ubenchmark/src/.ycm_extra_conf.py'
 
 " eclim auto complete
@@ -124,13 +130,15 @@ nmap <leader>b :TagbarToggle<CR>
 nmap <leader>v :TagbarOpen j<CR>
 "nmap <leader>p :TagbarTogglePause<CR>
 nnoremap <leader>p :CtrlPTag<cr>
-" :W sudo saves the file 
+
+map <leader>x :SyntasticCheck<cr>
+" :W sudo saves the file
 " (useful for handling the permission-denied error)
 "command W w !sudo tee % > /dev/null
 
 " fixing common mistakes
-command W w
-command Q q
+command! W w
+command! Q q
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => VIM user interface
@@ -139,7 +147,7 @@ command Q q
 set so=7
 
 " Avoid garbled characters in Chinese language windows OS
-let $LANG='en' 
+let $LANG='en'
 set langmenu=en
 source $VIMRUNTIME/delmenu.vim
 source $VIMRUNTIME/menu.vim
@@ -148,18 +156,18 @@ source $VIMRUNTIME/menu.vim
 set wildmenu
 
 " Ignore compiled files
-set wildignore=*.o,*~,*.pyc
+set wildignore=*.o,*~,*.pyc,*.d,*.crf,*.rst,*.axf,*.lnp,*.lst,*.map,*.iex,*.scvd,*.htm,*.dep,*.tra,*.plg,*.uv*,*.xls
 if has("win16") || has("win32")
-    set wildignore+=.git\*,.hg\*,.svn\*
+set wildignore+=.git\*,.hg\*,.svn\*
 else
-    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
 endif
 
 "Always show current position
 set ruler
 
 " Height of the command bar
-set cmdheight=2
+set cmdheight=1
 
 " A buffer becomes hidden when it is abandoned
 set hid
@@ -171,25 +179,25 @@ set whichwrap+=<,>,h,l
 " Ignore case when searching
 set ignorecase
 
-" When searching try to be smart about cases 
+" When searching try to be smart about cases
 set smartcase
 
 " Highlight search results
 set hlsearch
 
 " Makes search act like search in modern browsers
-set incsearch 
+set incsearch
 
 " Don't redraw while executing macros (good performance config)
-set lazyredraw 
+set lazyredraw
 
 " For regular expressions turn magic on
 set magic
 
 " Show matching brackets when text indicator is over them
-set showmatch 
+set showmatch
 " How many tenths of a second to blink when matching brackets
-set mat=2
+set mat=1
 
 " No annoying sound on errors
 set noerrorbells
@@ -205,63 +213,49 @@ set tm=500
 " => Colors and Fonts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable syntax highlighting
-syntax enable 
+syntax enable
 
-set background=dark
-"colorscheme desert
+" set background=dark
+" colorscheme desert
 if filereadable(expand("~/.vim/bundle/vim-colors-solarized/colors/solarized.vim"))
-    let g:solarized_termcolors=256
-    let g:solarized_termtrans=1
-    let g:solarized_contrast="normal"
-    let g:solarized_visibility="normal"
-    colorscheme solarized
+" let g:solarized_termcolors=256
+" let g:solarized_termtrans=1
+" let g:solarized_contrast="high"
+let g:solarized_contrast="normal"
+let g:solarized_visibility="normal"
+let g:solarized_italic=1
+let g:solarized_bold=1
+let g:solarized_underline=1
+colorscheme solarized
 endif
 
 
 set cursorline                  " Highlight current line
-
-highlight Pmenu ctermfg=0 ctermbg=7
-highlight PmenuSel ctermfg=0 ctermbg=4
-
-if has('cmdline_info')
-        set ruler                   " Show the ruler
-        set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " A ruler on steroids
-        set showcmd                 " Show partial commands in status line and
-                                    " Selected characters/lines in visual mode
-    endif
-
-if has('statusline')
-    set laststatus=2
-
-    " Broken down into easily includeable segments
-    set statusline=%<%f\                     " Filename
-    set statusline+=%w%h%m%r                 " Options
-    set statusline+=\ [%{&ff}/%Y]            " Filetype
-    " set statusline+=\ [%{getcwd()}]          " Current dir
-    set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
-endif
+" set cursorcolumn                " Highlight current column
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 0
 " let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0 
+let g:syntastic_check_on_wq = 0
 "let g:syntastic_quiet_messages = { "type": "style" }
 let g:syntastic_python_pylint_args = '--rcfile=/home/robgol01/.pylintrc'
 let g:syntastic_python_flake8_args = '--config=/home/robgol01/.config/flake8'
 let g:syntastic_aggregate_errors = 1
 let g:syntastic_python_checkers = ['flake8', 'pylint', 'python']
+let g:syntastic_mode_map = {"mode": "passive"}
+
 
 " Set extra options when running in GUI mode
 if has("gui_running")
-    set guioptions-=T
-    set guioptions-=e
-    set t_Co=256
-    set guitablabel=%M\ %t
+set guioptions-=T
+set guioptions-=e
+set t_Co=256
+set guitablabel=%M\ %t
 endif
 
 " Set utf8 as standard encoding and en_US as the standard language
-set encoding=utf8
+set encoding=utf-8
 
 " Use Unix as the standard file type
 set ffs=unix,dos,mac
@@ -325,9 +319,10 @@ map <C-l> <C-W>l
 
 " Close the current buffer
 "map <leader>bd :Bclose<cr>:tabclose<cr>gT
+map <leader>bd :Bclose<cr>
 
 " Close all the buffers
-"map <leader>ba :bufdo bd<cr>
+map <leader>ba :bufdo bd<cr>
 
 map <leader>l :bnext<cr>
 map <leader>h :bprevious<cr>
@@ -336,8 +331,8 @@ map <leader>h :bprevious<cr>
 map <leader>tn :tabnew<cr>
 map <leader>to :tabonly<cr>
 map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove 
-map <leader>t<leader> :tabnext 
+map <leader>tm :tabmove
+map <leader>t<leader> :tabnext
 
 " Let 'tl' toggle between this and the last accessed tab
 let g:lasttab = 1
@@ -352,10 +347,10 @@ map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
 " Switch CWD to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
 
-" Specify the behavior when switching between buffers 
+" Specify the behavior when switching between buffers
 try
-  set switchbuf=useopen,usetab,newtab
-  set stal=2
+set switchbuf=useopen,usetab,newtab
+set stal=2
 catch
 endtry
 
@@ -368,16 +363,32 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 """"""""""""""""""""""""""""""
 " Always show the status line
 set laststatus=2
+" air-line
+let g:airline_powerline_fonts = 1
 
-" Format the status line
-" set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
+if !exists('g:airline_symbols')
+let g:airline_symbols = {}
+endif
+
+" Enable the list of buffers
+let g:airline#extensions#tabline#enabled = 1
+
+" Show just the filename
+let g:airline#extensions#tabline#fnamemod = ':t'
+
+" disable whitespace checking
+let g:airline#extensions#whitespace#enabled = 0
+let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
+let g:airline#parts#filetype#enabled = 0
+let g:airline_section_x = ''
+let g:airline_skip_empty_sections = 1
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Editing mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Remap VIM 0 to first non-blank character
-"map 0 ^
+map 0 ^
 
 " Move a line of text using ALT+[jk] or Command+[jk] on mac
 "nmap <M-j> mz:m+<cr>`z
@@ -386,14 +397,14 @@ set laststatus=2
 "vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 
 " Delete trailing white space on save, useful for Python and CoffeeScript ;)
-func! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
-endfunc
-autocmd BufWrite *.py :call DeleteTrailingWS()
-autocmd BufWrite *.coffee :call DeleteTrailingWS()
-au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")| exe "normal! g'\"" | endif
+" func! DeleteTrailingWS()
+"   exe "normal mz"
+"   %s/\s\+$//ge
+"   exe "normal `z"
+" endfunc
+" autocmd BufWrite *.py :call DeleteTrailingWS()
+" autocmd BufWrite *.coffee :call DeleteTrailingWS()
+" au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")| exe "normal! g'\"" | endif
 
 
 
@@ -420,7 +431,7 @@ noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 map <leader>q :e ~/buffer<cr>
 
 " Quickly open a markdown buffer for scribble
-map <leader>x :e ~/buffer.md<cr>
+map <leader>z :e ~/buffer.md<cr>
 
 " Toggle paste mode on and off
 map <leader>pp :setlocal paste!<cr>
@@ -435,7 +446,7 @@ function! CmdLine(str)
     exe "menu Foo.Bar :" . a:str
     emenu Foo.Bar
     unmenu Foo
-endfunction 
+endfunction
 
 function! VisualSelection(direction, extra_filter) range
     let l:saved_reg = @"
@@ -484,7 +495,11 @@ function! <SID>BufcloseCloseIt()
    endif
 endfunction
 
-let g:NERDTreeDirArrowExpandable = '+'
-let g:NERDTreeDirArrowCollapsible = '-'
 
+let NERDTreeIgnore = ['\.pyc$', '\.crf', '\.d', '\.o', '\.scvd', '\.uv*', '\.dep', '\.htm', '\.axf', '\.lnp', '\.lst', '\.map', '\.iex']
+
+let g:ctrlp_by_filename = 1
+let g:ctrlp_show_hidden = 1
+let g:ctrlp_extensions = ['tag']
+" ctrl d(filename/path),f(modes), r(regex)
 autocmd BufWritePre * %s/\s\+$//e
