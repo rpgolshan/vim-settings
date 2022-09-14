@@ -34,8 +34,9 @@ Plugin 'scrooloose/nerdcommenter'
 " Fugitive - git intergrator https://github.com/tpope/vim-fugitive
 Plugin 'tpope/vim-fugitive'
 
-"linter - https://github.com/vim-syntastic/syntastic
-Plugin 'vim-syntastic/syntastic'
+" Asynchronous linter
+Plugin 'dense-analysis/ale'
+
 
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
@@ -45,12 +46,20 @@ Plugin 'tpope/vim-surround'
 Plugin 'ryanoasis/vim-devicons'
 " Plugin 'powerline/fonts'
 
-Plugin 'Valloric/YouCompleteMe'
+Plugin 'ycm-core/YouCompleteMe'
 "ycm extra conf generator -- :YcmGenerateConfig
 Plugin 'rdnetto/YCM-Generator'
 " eclim
 " INSTALL THIS ON YOUR OWN FOR JAVA AUTOCOMPLETE TO WORK
 
+
+" Jinja2 syntax support
+Plugin 'chase/vim-ansible-yaml'
+Plugin 'Glench/Vim-Jinja2-Syntax'
+
+" React jsx support
+Plugin 'yuezk/vim-js'
+Plugin 'maxmellon/vim-jsx-pretty'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -108,30 +117,38 @@ let g:NERDDefaultAlign = "left"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" With a map leader it's possible to do extra key combinations
+" like <leader>w saves the current file
+let mapleader = ","
+let g:mapleader = ","
+
 " Show line numbers
 set relativenumber
 set number
+" Toggle line numbers on and off
+map <leader>nn :setlocal number! relativenumber!<cr>
+
 " Sets how many lines of history VIM has to remember
 set history=500
 
 " Set to auto read when a file is changed from the outside
 set autoread
 
-" With a map leader it's possible to do extra key combinations
-" like <leader>w saves the current file
-let mapleader = ","
-let g:mapleader = ","
-
 " Fast saving
 nmap <leader>w :w!<cr>
 
 nmap <leader>n :NERDTreeToggle<CR>
 nmap <leader>b :TagbarToggle<CR>
-nmap <leader>v :TagbarOpen j<CR>
+" nmap <leader>v :TagbarOpen j<CR>
 "nmap <leader>p :TagbarTogglePause<CR>
 nnoremap <leader>p :CtrlPTag<cr>
 
-map <leader>x :SyntasticCheck<cr>
+" map <leader>x :SyntasticCheck<cr>
+map <leader>x :ALEFix<cr>
+map <leader>c :lclose<cr>
+map <leader>v :lopen<cr>
+map <leader>g :Gstatus<cr>
+
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
 "command W w !sudo tee % > /dev/null
@@ -139,6 +156,11 @@ map <leader>x :SyntasticCheck<cr>
 " fixing common mistakes
 command! W w
 command! Q q
+command! Wq wq
+command! WQ wq
+
+"vimdiff verticle
+set diffopt=vertical,filler
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => VIM user interface
@@ -233,17 +255,10 @@ endif
 set cursorline                  " Highlight current line
 " set cursorcolumn                " Highlight current column
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 0
-" let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
-"let g:syntastic_quiet_messages = { "type": "style" }
-let g:syntastic_python_pylint_args = '--rcfile=/home/robgol01/.pylintrc'
-let g:syntastic_python_flake8_args = '--config=/home/robgol01/.config/flake8'
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_python_checkers = ['flake8', 'pylint', 'python']
-let g:syntastic_mode_map = {"mode": "passive"}
+let g:ale_linters = {'python': ['pylint', 'mypy']}
+let g:ale_fixers = {'python': ['yapf']}
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 0
 
 
 " Set extra options when running in GUI mode
@@ -283,13 +298,21 @@ set smarttab
 set shiftwidth=4
 set tabstop=4
 
-" Linebreak on 500 characters
+" Linebreak on 120 characters
 set lbr
-set tw=500
+set wrap "Wrap lines
+set nolist "list disables linebreak
+set tw=120
+set fo+=t "enable automatic text wrapping
+" Set .yaml,.commit file tw to be 80
+autocmd BufReadPost,BufNewFile *.yaml,*COMMIT_EDITMSG setlocal tw=72
+
+autocmd FileType c setlocal shiftwidth=8 noexpandtab
+autocmd FileType yml,yaml setlocal shiftwidth=2 tabstop=2 ft=ansible
+autocmd FileType js setlocal shiftwidth=2 tabstop=2
 
 set ai "Auto indent
 set si "Smart indent
-set wrap "Wrap lines
 
 
 """"""""""""""""""""""""""""""
@@ -330,9 +353,9 @@ map <leader>h :bprevious<cr>
 " Useful mappings for managing tabs
 map <leader>tn :tabnew<cr>
 map <leader>to :tabonly<cr>
-map <leader>tc :tabclose<cr>
+map <leader>td :tabclose<cr>
 map <leader>tm :tabmove
-map <leader>t<leader> :tabnext
+map <leader>tn :tabnext
 
 " Let 'tl' toggle between this and the last accessed tab
 let g:lasttab = 1
@@ -349,7 +372,7 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 
 " Specify the behavior when switching between buffers
 try
-set switchbuf=useopen,usetab,newtab
+set switchbuf=useopen
 set stal=2
 catch
 endtry
@@ -377,7 +400,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 
 " disable whitespace checking
-let g:airline#extensions#whitespace#enabled = 0
+let g:airline#extensions#whitespace#enabled = 1
 let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
 let g:airline#parts#filetype#enabled = 0
 let g:airline_section_x = ''
@@ -397,14 +420,15 @@ map 0 ^
 "vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 
 " Delete trailing white space on save, useful for Python and CoffeeScript ;)
-" func! DeleteTrailingWS()
-"   exe "normal mz"
-"   %s/\s\+$//ge
-"   exe "normal `z"
-" endfunc
+func! DeleteTrailingWS()
+  exe "normal mz"
+  %s/\s\+$//ge
+  exe "normal `z"
+endfunc
 " autocmd BufWrite *.py :call DeleteTrailingWS()
 " autocmd BufWrite *.coffee :call DeleteTrailingWS()
-" au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")| exe "normal! g'\"" | endif
+autocmd BufWritePre * :call DeleteTrailingWS()
+au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")| exe "normal! g'\"" | endif
 
 
 
@@ -496,10 +520,11 @@ function! <SID>BufcloseCloseIt()
 endfunction
 
 
-let NERDTreeIgnore = ['\.pyc$', '\.crf', '\.d', '\.o', '\.scvd', '\.uv*', '\.dep', '\.htm', '\.axf', '\.lnp', '\.lst', '\.map', '\.iex']
+let NERDTreeIgnore = ['\.pyc$', '^__pycache__$[[dir]]', '\.crf', '\.d$[[file]]', '\.o$[[file]]', '\.scvd', '\.uv*', '\.dep', '\.axf', '\.lnp', '\.lst', '\.map', '\.iex', '\.egg-info$[[dir]]']
 
-let g:ctrlp_by_filename = 1
+let g:ctrlp_cmd = 'CtrlPMRU'
+let g:ctrlp_by_filename = 0
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_extensions = ['tag']
 " ctrl d(filename/path),f(modes), r(regex)
-autocmd BufWritePre * %s/\s\+$//e
+" autocmd BufWritePre * %s/[^\s]\+\s\+$//e
